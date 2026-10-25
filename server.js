@@ -211,32 +211,35 @@ app.get('/api/buyers', requireAdminAuth, async (req, res) => {
       if (gRes.ok) {
         const gData = await gRes.json();
         if (gData && Array.isArray(gData.data) && gData.data.length > 0) {
-          // Normalize Google Sheet rows into standard Lead objects
+          // Normalize Google Sheet rows into standard Lead objects (flexible header mapping)
           const sheetBuyers = gData.data.map((row, idx) => {
             const leadId = row['ID Lead'] || row['id'] || `BYR-GS${idx}`;
-            const cleanWa = String(row['WhatsApp'] || '').replace(/^'/, '');
+            const rawWa = row['No Whatsapp'] || row['No WhatsApp'] || row['WhatsApp'] || row['whatsapp'] || '';
+            const cleanWa = String(rawWa).replace(/^'/, '').trim();
+            const aksesMobil = row['Akses Mobil'] || '';
+
             return {
               id: leadId,
               createdAt: row['Timestamp'] || new Date().toISOString(),
               status: row['Status'] || 'NEW',
               profile: {
-                name: row['Nama'] || row['name'] || 'Lead',
+                name: row['Nama Lengkap'] || row['Nama'] || row['name'] || 'Lead',
                 whatsapp: cleanWa,
-                notes: row['Catatan'] || ''
+                notes: row['Catatan Tambahan'] || row['Catatan'] || row['notes'] || ''
               },
               preferences: {
-                propertyType: row['Tipe'] || 'Rumah Tinggal',
-                targetCity: row['Kota'] || 'Jabodetabek',
-                targetArea: row['Area'] || '-',
-                minBedrooms: row['Kamar'] || 'Bebas',
-                carAccessRequired: row['Akses Mobil'] === 'Wajib Mobil',
-                carAccessFlexible: row['Akses Mobil'] === 'Bebas',
-                certificatePreference: row['Sertifikat'] || 'SHM Wajib'
+                propertyType: row['Tipe Properti'] || row['Tipe'] || row['propertyType'] || 'Rumah Tinggal',
+                targetCity: row['Kota Target'] || row['Kota'] || row['targetCity'] || 'Jabodetabek',
+                targetArea: row['Area / Patokan'] || row['Area'] || row['targetArea'] || '-',
+                minBedrooms: row['Min Kamar'] || row['Kamar'] || row['minBedrooms'] || 'Bebas',
+                carAccessRequired: aksesMobil.toLowerCase().includes('mobil') || aksesMobil === 'Wajib Mobil',
+                carAccessFlexible: aksesMobil.toLowerCase().includes('bebas') || aksesMobil === 'Bebas',
+                certificatePreference: row['Sertifikat'] || row['certificatePreference'] || 'SHM Wajib'
               },
               financial: {
-                budgetRange: row['Budget'] || 'Rp 700 Jt - 1.2 M',
-                paymentMethod: row['Metode Bayar'] || 'KPR Bank',
-                purchaseTimeline: row['Timeline'] || '1 - 3 Bulan'
+                budgetRange: row['Budget Maksimal'] || row['Budget'] || row['budgetRange'] || 'Rp 700 Jt - 1.2 M',
+                paymentMethod: row['Metode Bayar'] || row['paymentMethod'] || 'KPR Bank',
+                purchaseTimeline: row['Timeline Beli'] || row['Timeline'] || row['purchaseTimeline'] || '1 - 3 Bulan'
               }
             };
           }).reverse(); // Most recent first
