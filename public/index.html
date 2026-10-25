@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PropertySF &bull; Direct-Owner Property Sourcing</title>
+  <meta name="description" content="Layanan kurasi properti direct-owner independen. Temukan rumah, tanah, atau aset komersial sesuai spesifikasi Anda tanpa spam agen.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-symbol">P</div>
+      <span class="brand-text">PropertySF</span>
+      <span class="brand-meta">Sourcing &amp; Matchmaking</span>
+    </a>
+  </header>
+
+  <!-- Content Container -->
+  <main class="container">
+    <header class="editorial-header">
+      <div class="editorial-tag">
+        <span class="dot"></span>
+        Direct-Owner Matching &bull; Bebas Biaya Pembeli
+      </div>
+      <h1 class="editorial-title">Pencarian Properti Sesuai Kriteria Anda</h1>
+      <p class="editorial-desc">
+        Kami memfilter ribuan penawaran dari pemilik langsung (off-market &amp; direct-owner) untuk mencocokkan hanya unit yang memenuhi parameter lokasi, legalitas, dan budget riil Anda.
+      </p>
+    </header>
+
+    <!-- Multi-Step Card -->
+    <div class="form-card" id="formCard">
+      <!-- Stepper Header -->
+      <nav class="stepper" aria-label="Progress formulir">
+        <div class="step-indicator active" id="ind1">
+          <div class="step-circle">1</div>
+          <span class="step-name">Tipe &amp; Lokasi</span>
+        </div>
+        <div class="step-indicator" id="ind2">
+          <div class="step-circle">2</div>
+          <span class="step-name">Finansial</span>
+        </div>
+        <div class="step-indicator" id="ind3">
+          <div class="step-circle">3</div>
+          <span class="step-name">Spesifikasi</span>
+        </div>
+        <div class="step-indicator" id="ind4">
+          <div class="step-circle">4</div>
+          <span class="step-name">Kontak</span>
+        </div>
+      </nav>
+
+      <form id="buyerIntakeForm">
+        <!-- STEP 1: Tipe & Lokasi -->
+        <div class="step-pane active" id="step1">
+          <div class="pane-header">
+            <h2 class="pane-title">Tipe Properti &amp; Target Wilayah</h2>
+            <p class="pane-desc">Tentukan aset yang dicari beserta area prioritas Anda.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="propertyTypeInput">Tipe Properti</label>
+            <input type="text" id="propertyTypeInput" class="field-input" list="propertyTypeSuggestions" placeholder="Ketik bebas atau klik rekomendasi di bawah..." value="Rumah Tinggal" required autocomplete="off">
+            <datalist id="propertyTypeSuggestions">
+              <option value="Rumah Tinggal">
+              <option value="Tanah / Kavling">
+              <option value="Ruko / Komersial">
+              <option value="Kost / Kontrakan">
+              <option value="Apartemen / Condominium">
+              <option value="Villa / Resort">
+              <option value="Gudang / Logistik">
+              <option value="Pabrik / Industri">
+              <option value="Kebun / Lahan Pertanian">
+            </datalist>
+
+            <!-- Suggestion Pills -->
+            <div style="margin-top: 0.75rem;">
+              <div class="pill-grid" id="suggestionPills">
+                <button type="button" class="tag-btn active" data-val="Rumah Tinggal">Rumah Tinggal</button>
+                <button type="button" class="tag-btn" data-val="Tanah / Kavling">Tanah / Kavling</button>
+                <button type="button" class="tag-btn" data-val="Ruko / Komersial">Ruko / Komersial</button>
+                <button type="button" class="tag-btn" data-val="Kost / Kontrakan">Kost / Kontrakan</button>
+                <button type="button" class="tag-btn" data-val="Apartemen">Apartemen</button>
+                <button type="button" class="tag-btn" data-val="Villa / Resort">Villa / Resort</button>
+                <button type="button" class="tag-btn" data-val="Gudang / Pabrik">Gudang / Pabrik</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="targetCity">Kota / Wilayah Utama</label>
+            <input type="text" id="targetCity" class="field-input" placeholder="Misal: Tangerang Selatan, Jakarta Barat, Sleman Yogyakarta..." required>
+          </div>
+
+          <div class="field-group" style="margin-bottom: 0.5rem;">
+            <label class="field-label" for="targetArea">Area / Landmark Spesifik (Opsional)</label>
+            <input type="text" id="targetArea" class="field-input" placeholder="Misal: Radius 3 km dari stasiun Bintaro, dekat tol BSD, Pogung...">
+          </div>
+        </div>
+
+        <!-- STEP 2: Finansial -->
+        <div class="step-pane" id="step2">
+          <div class="pane-header">
+            <h2 class="pane-title">Rencana Anggaran &amp; Pembayaran</h2>
+            <p class="pane-desc">Informasi ini membantu menyaring penawaran yang realistis dan siap transaksi.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Rentang Budget Maksimal</label>
+            <div class="selector-grid">
+              <div class="card-radio">
+                <input type="radio" name="budgetRange" id="b1" value="Di Bawah Rp 700 Juta" data-max="700000000">
+                <label for="b1">
+                  <span class="title">&lt; Rp 700 Jt</span>
+                  <span class="sub">Entry-level / Lahan</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="budgetRange" id="b2" value="Rp 700 Jt - 1.2 M" data-max="1200000000" checked>
+                <label for="b2">
+                  <span class="title">700 Jt - 1.2 M</span>
+                  <span class="sub">First-home buyer</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="budgetRange" id="b3" value="Rp 1.2 M - 2 M" data-max="2000000000">
+                <label for="b3">
+                  <span class="title">1.2 M - 2 M</span>
+                  <span class="sub">Mid-range / Upgrade</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="budgetRange" id="b4" value="Rp 2 M - 3.5 M" data-max="3500000000">
+                <label for="b4">
+                  <span class="title">2 M - 3.5 M</span>
+                  <span class="sub">Prime area / Ruko</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="budgetRange" id="b5" value="Di Atas Rp 3.5 M" data-max="5000000000">
+                <label for="b5">
+                  <span class="title">&gt; Rp 3.5 M</span>
+                  <span class="sub">Luxury / Commercial</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Metode Pembayaran</label>
+            <div class="selector-grid">
+              <div class="card-radio">
+                <input type="radio" name="paymentMethod" id="payKPR" value="KPR Bank" checked>
+                <label for="payKPR">
+                  <span class="title">KPR Bank</span>
+                  <span class="sub">Fasilitas kredit bank</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="paymentMethod" id="payCash" value="Cash Keras">
+                <label for="payCash">
+                  <span class="title">Cash Keras</span>
+                  <span class="sub">Pelunasan tunai / AJB</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="paymentMethod" id="payBertahap" value="Cash Bertahap">
+                <label for="payBertahap">
+                  <span class="title">Cash Bertahap</span>
+                  <span class="sub">Cicil langsung ke owner</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-bottom: 0.5rem;">
+            <label class="field-label">Timeline Pembelian</label>
+            <div class="selector-grid">
+              <div class="card-radio">
+                <input type="radio" name="purchaseTimeline" id="t1" value="Bulan Ini (Siap DP)" checked>
+                <label for="t1">
+                  <span class="title">Segera / Bulan Ini</span>
+                  <span class="sub">Dana siap transaksi</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="purchaseTimeline" id="t2" value="1 - 3 Bulan ke Depan">
+                <label for="t2">
+                  <span class="title">1 - 3 Bulan</span>
+                  <span class="sub">Sedang persiapan</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="purchaseTimeline" id="t3" value="Masih Riset / Santai">
+                <label for="t3">
+                  <span class="title">Eksplorasi</span>
+                  <span class="sub">Memantau pasar</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Spesifikasi Fisik & Legalitas -->
+        <div class="step-pane" id="step3">
+          <div class="pane-header">
+            <h2 class="pane-title">Spesifikasi Kunci &amp; Legalitas</h2>
+            <p class="pane-desc">Parameter non-negotiable agar kami tidak mengirimkan unit yang tidak sesuai standar Anda.</p>
+          </div>
+
+          <!-- Minimal Kamar Tidur with Toggle -->
+          <div class="field-group">
+            <div class="field-header-row">
+              <label class="field-label" style="margin-bottom: 0;">Minimal Kamar Tidur</label>
+              <div class="toggle-control">
+                <span class="toggle-status-text active" id="bedroomToggleText">Aktif</span>
+                <label class="switch-ui" aria-label="Toggle kriteria kamar tidur">
+                  <input type="checkbox" id="toggleBedrooms" checked>
+                  <span class="switch-track"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="collapsible-content" id="bedroomSelectorWrap">
+              <div class="selector-grid">
+                <div class="card-radio">
+                  <input type="radio" name="minBedrooms" id="kt2" value="2">
+                  <label for="kt2">
+                    <span class="title">2 Kamar</span>
+                    <span class="sub">Minimal</span>
+                  </label>
+                </div>
+                <div class="card-radio">
+                  <input type="radio" name="minBedrooms" id="kt3" value="3" checked>
+                  <label for="kt3">
+                    <span class="title">3 Kamar</span>
+                    <span class="sub">Standar keluarga</span>
+                  </label>
+                </div>
+                <div class="card-radio">
+                  <input type="radio" name="minBedrooms" id="kt4" value="4+">
+                  <label for="kt4">
+                    <span class="title">4+ Kamar</span>
+                    <span class="sub">Besar / Multi-gen</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="disabled-placeholder" id="bedroomPlaceholder" style="display: none;">
+              Bebas / Tanpa preferensi jumlah kamar (fleksibel untuk tanah, ruko, atau gudang)
+            </div>
+          </div>
+
+          <!-- Akses Kendaraan with Toggle -->
+          <div class="field-group">
+            <div class="field-header-row">
+              <label class="field-label" style="margin-bottom: 0;">Akses Kendaraan</label>
+              <div class="toggle-control">
+                <span class="toggle-status-text active" id="carToggleText">Aktif</span>
+                <label class="switch-ui" aria-label="Toggle kriteria akses kendaraan">
+                  <input type="checkbox" id="toggleCarAccess" checked>
+                  <span class="switch-track"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="collapsible-content" id="carSelectorWrap">
+              <div class="selector-grid">
+                <div class="card-radio">
+                  <input type="radio" name="carAccess" id="carYes" value="true" checked>
+                  <label for="carYes">
+                    <span class="title">Wajib Masuk Mobil</span>
+                    <span class="sub">Ada carport / row 2 mobil</span>
+                  </label>
+                </div>
+                <div class="card-radio">
+                  <input type="radio" name="carAccess" id="carNo" value="false">
+                  <label for="carNo">
+                    <span class="title">Akses Motor Cukup</span>
+                    <span class="sub">Bukan prioritas mobil</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="disabled-placeholder" id="carPlaceholder" style="display: none;">
+              Bebas / Tanpa batasan akses jalan khusus
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-bottom: 0.5rem;">
+            <label class="field-label">Status Sertifikat</label>
+            <div class="selector-grid">
+              <div class="card-radio">
+                <input type="radio" name="certPref" id="certSHM" value="SHM Wajib" checked>
+                <label for="certSHM">
+                  <span class="title">Wajib SHM</span>
+                  <span class="sub">Hak Milik mutlak</span>
+                </label>
+              </div>
+              <div class="card-radio">
+                <input type="radio" name="certPref" id="certAny" value="HGB / SHM Boleh">
+                <label for="certAny">
+                  <span class="title">HGB / Strata Terbuka</span>
+                  <span class="sub">Apartemen / Developer</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Kontak & Saluran Pengiriman -->
+        <div class="step-pane" id="step4">
+          <div class="pane-header">
+            <h2 class="pane-title">Saluran Penerimaan Notifikasi</h2>
+            <p class="pane-desc">Informasi kontak Anda disimpan dengan aman dan hanya digunakan untuk mengirimkan kurasi yang lolos seleksi.</p>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fullName">Nama Lengkap / Panggilan</label>
+            <input type="text" id="fullName" class="field-input" placeholder="Contoh: Dimas Pratama" required>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="whatsappNumber">Nomor WhatsApp Aktif</label>
+            <input type="tel" id="whatsappNumber" class="field-input" placeholder="Contoh: 08128899xxxx" required>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="buyerNotes">Catatan Tambahan (Opsional)</label>
+            <textarea id="buyerNotes" class="field-textarea" placeholder="Contoh: Mengutamakan lingkungan tenang, bebas banjir, halaman kecil untuk anak bermain..."></textarea>
+          </div>
+
+          <div class="guarantee-note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="guarantee-text">
+              <strong>Standar Privasi PropertySF:</strong> Data Anda tidak akan dimasukkan ke grup broadcast dan tidak dialihkan ke pihak ketiga. Anda hanya dihubungi jika unit direct-owner yang cocok 100% telah melewati verifikasi awal.
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Navigation -->
+        <footer class="form-footer">
+          <button type="button" class="button button-ghost" id="prevBtn" style="visibility: hidden;">
+            &larr; Kembali
+          </button>
+          <button type="button" class="button button-solid" id="nextBtn">
+            Langkah Selanjutnya &rarr;
+          </button>
+          <button type="submit" class="button button-solid" id="submitBtn" style="display: none;">
+            Kirim Kriteria Sourcing &check;
+          </button>
+        </footer>
+      </form>
+
+      <!-- Success Screen -->
+      <div class="success-box" id="successScreen">
+        <div class="success-check">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="pane-title">Kriteria Anda Berhasil Terdaftar</h2>
+        <div class="lead-id-badge" id="leadIdDisplay">#BYR-DEMO</div>
+        <p class="pane-desc" style="max-width: 440px; margin: 0 auto 1.5rem auto;">
+          Sistem kami telah mengindeks parameter kebutuhan Anda. Segera setelah ada listing direct-owner yang cocok, tim kurasi akan mengirimkan lembar fakta via WhatsApp.
+        </p>
+        <button type="button" class="button button-ghost" onclick="window.location.reload()">
+          Daftarkan Permintaan Properti Lain
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

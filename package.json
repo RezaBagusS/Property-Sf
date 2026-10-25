@@ -1,0 +1,32 @@
+{
+  "name": "property-sf",
+  "version": "1.0.0",
+  "description": "Direct-owner property sourcing and matchmaking platform connecting social media sellers with qualified buyer demand.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "lint": "node -c server.js public/app.js public/admin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RezaBagusS/Property-Sf.git"
+  },
+  "keywords": [
+    "real-estate",
+    "property-sourcing",
+    "deal-matchmaking",
+    "direct-owner",
+    "google-sheets",
+    "vercel-serverless"
+  ],
+  "author": "Reza Bagus Saputra <rezabahussaputra036@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RezaBagusS/Property-Sf/issues"
+  },
+  "homepage": "https://github.com/RezaBagusS/Property-Sf#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

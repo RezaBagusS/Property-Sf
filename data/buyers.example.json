@@ -1,0 +1,27 @@
+[
+  {
+    "id": "BYR-SAMPLE01",
+    "createdAt": "2026-10-25T12:00:00.000Z",
+    "status": "NEW",
+    "profile": {
+      "name": "Dimas Pratama",
+      "whatsapp": "081288991234",
+      "notes": "Mencari dekat stasiun KRL atau pintu tol, untuk ditempati keluarga muda."
+    },
+    "preferences": {
+      "propertyType": "Rumah Tinggal",
+      "targetCity": "Tangerang Selatan",
+      "targetArea": "BSD, Serpong, Bintaro",
+      "minBedrooms": "3",
+      "carAccessRequired": true,
+      "carAccessFlexible": false,
+      "certificatePreference": "SHM Wajib"
+    },
+    "financial": {
+      "budgetRange": "Rp 1.2 M - 2 M",
+      "budgetMax": 2000000000,
+      "paymentMethod": "KPR Bank",
+      "purchaseTimeline": "Bulan Ini (Siap DP)"
+    }
+  }
+]

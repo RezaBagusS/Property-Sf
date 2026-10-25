@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demand Registry &bull; PropertySF Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .login-container {
+      max-width: 420px;
+      margin: 6rem auto;
+      padding: 2.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      text-align: center;
+    }
+    .shake-anim {
+      animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+      40%, 60% { transform: translate3d(3px, 0, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-symbol">P</div>
+      <span class="brand-text">PropertySF</span>
+      <span class="brand-meta">Internal Registry</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/" class="nav-btn" target="_blank">&larr; Form Pembeli</a>
+      <button class="nav-btn" id="logoutBtn" style="display: none;" onclick="logoutAdmin()">Keluar</button>
+    </nav>
+  </header>
+
+  <!-- Login Gatekeeper (Shown if not logged in) -->
+  <div id="adminLoginGate" class="login-container">
+    <div style="width: 44px; height: 44px; background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2 style="font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 0.35rem;">
+      Admin Registry Access
+    </h2>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.75rem;">
+      Area terbatas. Masukkan password admin untuk membuka database permintaan pembeli.
+    </p>
+
+    <form id="adminLoginForm">
+      <div style="margin-bottom: 1.25rem; text-align: left;">
+        <label class="field-label" for="adminPasswordInput">Password Admin</label>
+        <input type="password" id="adminPasswordInput" class="field-input" placeholder="Masukkan password..." required autofocus>
+      </div>
+
+      <div id="loginErrorMessage" style="display: none; font-size: 0.8rem; color: #dc2626; margin-bottom: 1rem;">
+        Password salah. Akses ditolak.
+      </div>
+
+      <button type="submit" class="button button-solid" id="loginSubmitBtn" style="width: 100%;">
+        Buka Portal Admin &rarr;
+      </button>
+    </form>
+  </div>
+
+  <!-- Dashboard Container (Shown when logged in) -->
+  <main class="dashboard-container" id="dashboardContent" style="display: none;">
+    <div class="dash-header">
+      <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text-main); margin-bottom: 0.25rem;">
+          Buyer Demand Registry
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          Katalog calon pembeli terverifikasi untuk dicocokkan dengan listing direct-owner Threads.
+        </p>
+      </div>
+      <button class="button button-ghost" onclick="loadLeads()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Segarkan Data
+      </button>
+    </div>
+
+    <!-- Metrics Row -->
+    <div class="dash-stats-row">
+      <div class="dash-stat-tile">
+        <div class="stat-title">Total Permintaan</div>
+        <div class="stat-figure" id="statTotal">0</div>
+      </div>
+      <div class="dash-stat-tile">
+        <div class="stat-title">Pembeli Cash Keras</div>
+        <div class="stat-figure" style="color: var(--accent-success);" id="statCash">0</div>
+      </div>
+      <div class="dash-stat-tile">
+        <div class="stat-title">Siap Transaksi Bulan Ini</div>
+        <div class="stat-figure" style="color: var(--accent-brand);" id="statImmediate">0</div>
+      </div>
+      <div class="dash-stat-tile">
+        <div class="stat-title">Budget &gt; Rp 1.5 M</div>
+        <div class="stat-figure" id="statHighBudget">0</div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-toolbar">
+      <input type="text" id="searchCity" class="field-input" placeholder="Cari kota, wilayah, tipe properti, atau nama pembeli..." oninput="applyFilters()" style="flex: 1; min-width: 240px;">
+      <select id="filterPayment" class="field-input" onchange="applyFilters()" style="width: auto; min-width: 180px;">
+        <option value="">Semua Metode Pembayaran</option>
+        <option value="Cash Keras">Cash Keras</option>
+        <option value="KPR Bank">KPR Bank</option>
+        <option value="Cash Bertahap">Cash Bertahap</option>
+      </select>
+      <select id="filterStatus" class="field-input" onchange="applyFilters()" style="width: auto; min-width: 160px;">
+        <option value="">Semua Status</option>
+        <option value="NEW">Baru (Unmatched)</option>
+        <option value="MATCHED">Matched (Tercocokkan)</option>
+        <option value="CLOSED">Closed (Selesai)</option>
+      </select>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Calon Pembeli</th>
+            <th>Aset &amp; Wilayah Target</th>
+            <th>Anggaran &amp; Skema</th>
+            <th>Timeline</th>
+            <th>Status</th>
+            <th>Tindakan Cepat</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTableBody">
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">Memuat data registri...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
