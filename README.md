@@ -9,9 +9,15 @@
 
 **Platform kurasi independen yang membalik model transaksi properti konvensional: Menampung permintaan pembeli terverifikasi (*qualified buyer demand*) dan mencocokkannya dengan listing pemilik langsung (*direct-owner*) dari media sosial.**
 
-[Fitur Utama](#-fitur-utama) &bull; [Arsitektur Sistem](#-arsitektur-sistem) &bull; [Instalasi Lokal](#-instalasi-lokal) &bull; [Deploy ke Vercel](#-deploy-ke-vercel) &bull; [Google Sheets Setup](#-integrasi-google-sheets)
+[Fitur Utama](#-fitur-utama) &bull; [Arsitektur Sistem](#-arsitektur-sistem) &bull; [Panduan Bisnis &amp; SOP](#-panduan-operasional--legal) &bull; [Instalasi Lokal](#-instalasi-lokal) &bull; [Deploy ke Vercel](#-deploy-ke-vercel)
 
 </div>
+
+---
+
+## 💼 Panduan Operasional &amp; Legal
+Dokumentasi lengkap mengenai skrip outreach pemilik di Threads, protokol anti-bypass, dan draf surat komisi 1 lembar tersedia di:
+👉 **[docs/OPERATIONAL_GUIDE.md](./docs/OPERATIONAL_GUIDE.md)**
 
 ---
 

@@ -245,5 +245,73 @@ async function updateLeadStatus(id, newStatus) {
   }
 }
 
+// Export leads to Excel-ready CSV format
+function exportLeadsToCSV() {
+  if (!allLeads || allLeads.length === 0) {
+    alert('Tidak ada data pembeli untuk diekspor.');
+    return;
+  }
+
+  const headers = [
+    'ID Lead',
+    'Tanggal Daftar',
+    'Nama Pembeli',
+    'WhatsApp',
+    'Tipe Properti',
+    'Kota Target',
+    'Area Target',
+    'Budget',
+    'Metode Bayar',
+    'Timeline Pembelian',
+    'Kebutuhan Kamar',
+    'Akses Kendaraan',
+    'Sertifikat',
+    'Status Lead',
+    'Catatan Pembeli'
+  ];
+
+  const rows = allLeads.map(lead => {
+    let cleanWa = lead.profile.whatsapp.replace(/[^0-9]/g, '');
+    if (cleanWa.startsWith('0')) cleanWa = '62' + cleanWa.slice(1);
+
+    const bedroomText = lead.preferences.minBedrooms === 'Bebas' ? 'Bebas' : `${lead.preferences.minBedrooms} Kamar`;
+    const carText = lead.preferences.carAccessFlexible ? 'Bebas' : (lead.preferences.carAccessRequired ? 'Wajib Mobil' : 'Akses Motor');
+
+    return [
+      lead.id,
+      new Date(lead.createdAt).toLocaleString('id-ID'),
+      lead.profile.name,
+      `="${cleanWa}"`, // Formula trick in Excel to preserve leading numbers
+      lead.preferences.propertyType,
+      lead.preferences.targetCity,
+      lead.preferences.targetArea || '-',
+      lead.financial.budgetRange,
+      lead.financial.paymentMethod,
+      lead.financial.purchaseTimeline,
+      bedroomText,
+      carText,
+      lead.preferences.certificatePreference,
+      lead.status,
+      (lead.profile.notes || '-').replace(/"/g, '""')
+    ];
+  });
+
+  const csvContent = '\uFEFF' + [
+    headers.map(h => `"${h}"`).join(','),
+    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+  ].join('\r\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const now = new Date().toISOString().slice(0, 10);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `PropertySF_Leads_${now}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // Check session on startup
 checkAuthSession();

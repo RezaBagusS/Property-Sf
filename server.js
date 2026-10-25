@@ -196,10 +196,60 @@ app.post('/api/buyers', (req, res) => {
 // PROTECTED ADMIN ROUTES
 // =====================
 
-// GET: All buyer leads (Protected)
+// GET: All buyer leads (Protected, live from Google Sheets with fallback)
 app.get('/api/buyers', requireAdminAuth, async (req, res) => {
   const localBuyers = readBuyers();
-  res.json({ success: true, count: localBuyers.length, data: localBuyers });
+
+  // If Google Sheet Webhook is configured, attempt live fetch from Google Sheets
+  if (GOOGLE_SHEET_WEBHOOK_URL) {
+    try {
+      const gRes = await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: 'GET',
+        redirect: 'follow',
+        headers: { 'Accept': 'application/json' }
+      });
+      if (gRes.ok) {
+        const gData = await gRes.json();
+        if (gData && Array.isArray(gData.data) && gData.data.length > 0) {
+          // Normalize Google Sheet rows into standard Lead objects
+          const sheetBuyers = gData.data.map((row, idx) => {
+            const leadId = row['ID Lead'] || row['id'] || `BYR-GS${idx}`;
+            const cleanWa = String(row['WhatsApp'] || '').replace(/^'/, '');
+            return {
+              id: leadId,
+              createdAt: row['Timestamp'] || new Date().toISOString(),
+              status: row['Status'] || 'NEW',
+              profile: {
+                name: row['Nama'] || row['name'] || 'Lead',
+                whatsapp: cleanWa,
+                notes: row['Catatan'] || ''
+              },
+              preferences: {
+                propertyType: row['Tipe'] || 'Rumah Tinggal',
+                targetCity: row['Kota'] || 'Jabodetabek',
+                targetArea: row['Area'] || '-',
+                minBedrooms: row['Kamar'] || 'Bebas',
+                carAccessRequired: row['Akses Mobil'] === 'Wajib Mobil',
+                carAccessFlexible: row['Akses Mobil'] === 'Bebas',
+                certificatePreference: row['Sertifikat'] || 'SHM Wajib'
+              },
+              financial: {
+                budgetRange: row['Budget'] || 'Rp 700 Jt - 1.2 M',
+                paymentMethod: row['Metode Bayar'] || 'KPR Bank',
+                purchaseTimeline: row['Timeline'] || '1 - 3 Bulan'
+              }
+            };
+          }).reverse(); // Most recent first
+
+          return res.json({ success: true, count: sheetBuyers.length, source: 'google_sheets', data: sheetBuyers });
+        }
+      }
+    } catch (err) {
+      // Gracefully fall through to local cache on error
+    }
+  }
+
+  res.json({ success: true, count: localBuyers.length, source: 'local', data: localBuyers });
 });
 
 // PATCH: Update lead status (Protected)
