@@ -107,46 +107,25 @@ Repository ini telah dilengkapi dengan [`vercel.json`](./vercel.json) dan entry 
 
 ---
 
-## 📑 Integrasi Google Sheets
+## 📑 Integrasi Google Sheets (Two-Way Sync & Notifikasi Email)
+
+PropertySF menggunakan Google Sheets sebagai database persisten gratis yang tersinkronisasi 2 arah dengan Admin Registry Vercel:
 
 1. Buat spreadsheet baru di [Google Sheets](https://sheets.new).
-2. Buat header kolom di Baris 1:  
-   `Timestamp` | `ID Lead` | `Nama` | `WhatsApp` | `Tipe` | `Kota` | `Area` | `Budget` | `Metode Bayar` | `Timeline` | `Kamar` | `Akses Mobil` | `Sertifikat` | `Catatan` | `Status`
-3. Buka **Extensions** $\rightarrow$ **Apps Script**, tempel skrip webhook berikut:
+2. Buka menu **Extensions** $\rightarrow$ **Apps Script**.
+3. Hapus kode bawaan, lalu salin dan tempel kode dari [`scripts/google-apps-script.js`](./scripts/google-apps-script.js).
+4. *(Opsional)* Pilih fungsi `setupSheetHeaders` di toolbar atas lalu klik **Run** untuk membuat header kolom secara otomatis.
+5. Klik **Deploy** $\rightarrow$ **New deployment**:
+   - **Select type**: `Web app`
+   - **Description**: `PropertySF Webhook & Sync Engine v2`
+   - **Execute as**: `Me`
+   - **Who has access**: `Anyone` *(Wajib agar webhook Vercel dapat mengakses)*
+6. Klik **Deploy**, berikan izin otorisasi Google jika diminta, lalu salin **Web app URL** yang berakhiran `/exec`.
+7. Masukkan URL tersebut ke file `.env` lokal dan ke panel **Environment Variables** di Vercel (`GOOGLE_SHEET_WEBHOOK_URL`).
 
-```javascript
-function doPost(e) {
-  var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var data = JSON.parse(e.postData.contents);
-    sheet.appendRow([
-      new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
-      data.leadId || ("BYR-" + Date.now().toString(36).toUpperCase()),
-      data.profile.name,
-      "'" + data.profile.whatsapp,
-      data.preferences.propertyType,
-      data.preferences.targetCity,
-      data.preferences.targetArea || "-",
-      data.financial.budgetRange,
-      data.financial.paymentMethod,
-      data.financial.purchaseTimeline,
-      data.preferences.minBedrooms === "Bebas" ? "Bebas" : (data.preferences.minBedrooms + " Kamar"),
-      data.preferences.carAccessFlexible ? "Bebas" : (data.preferences.carAccessRequired ? "Wajib Mobil" : "Akses Motor"),
-      data.preferences.certificatePreference,
-      data.profile.notes || "-",
-      "NEW"
-    ]);
-    return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
-  }
-}
-```
-4. Klik **Deploy** $\rightarrow$ **New deployment** $\rightarrow$ Jenis: **Web app** $\rightarrow$ Who has access: **Anyone** $\rightarrow$ Salin URL Web App ke `.env` Anda.
+> [!TIP]
+> **Fitur Notifikasi Email Instan Gratis:**  
+> Setiap kali ada pembeli mengisi formulir, Google Apps Script akan otomatis mengirimkan email rekap data pembeli langsung ke Gmail Anda via `MailApp.sendEmail()` tanpa biaya API pihak ketiga!
 
 ---
 
@@ -162,12 +141,18 @@ Property-Sf/
 ├── data/
 │   ├── .gitkeep
 │   └── buyers.example.json      # Template skema data pembeli
+├── docs/
+│   └── OPERATIONAL_GUIDE.md     # SOP Anti-Bypass, naskah DM Threads, Surat Komisi
 ├── public/
 │   ├── admin.html               # Protected Admin Demand Registry UI
 │   ├── admin.js                 # Admin logic & WhatsApp lead routing
 │   ├── app.js                   # Client-side multi-step wizard logic
+│   ├── favicon.svg              # Minimalist architectural favicon
 │   ├── index.html               # Public Buyer Intake Wizard
+│   ├── og-image.svg             # Open Graph social preview banner
 │   └── style.css                # Architectural editorial design system
+├── scripts/
+│   └── google-apps-script.js    # Webhook, 2-way sync & Gmail notification script
 ├── .env.example                 # Environment variables specification
 ├── .gitignore                   # Git exclusion rules
 ├── LICENSE                      # MIT License
