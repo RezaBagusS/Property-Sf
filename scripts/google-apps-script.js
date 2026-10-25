@@ -12,7 +12,7 @@
 // KONFIGURASI EMAIL PENERIMA
 // Masukkan alamat Gmail Anda di bawah ini:
 // ==========================================
-var NOTIFICATION_EMAIL = ""; // Contoh: "rezabagus@gmail.com". Jika dikosongkan, akan mencoba mendeteksi email pemilik otomatis.
+var NOTIFICATION_EMAIL = "rezacuan123@gmail.com"; // Contoh: "rezabagus@gmail.com". Jika dikosongkan, akan mencoba mendeteksi email pemilik otomatis.
 
 function getTargetEmail() {
   if (NOTIFICATION_EMAIL && NOTIFICATION_EMAIL.trim() !== "") {
@@ -45,8 +45,8 @@ function doPost(e) {
     // Format kamar tidur
     var kamarStr = "Bebas";
     if (data.preferences && data.preferences.minBedrooms) {
-      kamarStr = data.preferences.minBedrooms === "Bebas" 
-        ? "Bebas" 
+      kamarStr = data.preferences.minBedrooms === "Bebas"
+        ? "Bebas"
         : data.preferences.minBedrooms + " Kamar";
     }
 
