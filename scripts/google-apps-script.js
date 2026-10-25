@@ -1,17 +1,33 @@
 /**
- * PropertySF - Google Apps Script Webhook & Sync Engine
- * -----------------------------------------------------
+ * PropertySF - Google Apps Script Webhook & Sync Engine v2.1
+ * ---------------------------------------------------------
  * Menyediakan sinkronisasi dua arah (Two-Way Sync):
- * 1. doPost(e) : Menerima lead baru dari web intake dan menyimpannya ke Google Sheets
- *                serta mengirim notifikasi email otomatis ke Gmail Anda (100% Gratis).
+ * 1. doPost(e) : Menerima lead baru dan mengirim notifikasi email otomatis ke Gmail Anda (100% Gratis).
  * 2. doGet(e)  : Membaca seluruh data lead dari Sheets untuk ditampilkan di Admin Registry Vercel.
- * 3. setupSheetHeaders() : Inisialisasi otomatis header kolom spreadsheet hanya dengan 1 klik run.
+ * 3. testSendEmail() : Uji coba kirim email & aktivasi izin otorisasi Google (Wajib dijalankan sekali).
+ * 4. setupSheetHeaders() : Inisialisasi otomatis header kolom spreadsheet.
  */
+
+// ==========================================
+// KONFIGURASI EMAIL PENERIMA
+// Masukkan alamat Gmail Anda di bawah ini:
+// ==========================================
+var NOTIFICATION_EMAIL = ""; // Contoh: "rezabagus@gmail.com". Jika dikosongkan, akan mencoba mendeteksi email pemilik otomatis.
+
+function getTargetEmail() {
+  if (NOTIFICATION_EMAIL && NOTIFICATION_EMAIL.trim() !== "") {
+    return NOTIFICATION_EMAIL.trim();
+  }
+  var effective = Session.getEffectiveUser().getEmail();
+  if (effective) return effective;
+  var active = Session.getActiveUser().getEmail();
+  if (active) return active;
+  return "";
+}
 
 // 1. RECEIVE NEW LEADS & SEND EMAIL NOTIFICATION
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  // Tunggu lock hingga 10 detik agar aman jika ada beberapa lead submit bersamaan
   if (!lock.tryLock(10000)) {
     return ContentService.createTextOutput(JSON.stringify({
       status: "error",
@@ -51,7 +67,7 @@ function doPost(e) {
       timestamp,
       leadId,
       data.profile.name,
-      "'" + data.profile.whatsapp, // Prefix ' agar 0 di depan tidak terhapus oleh Excel/Sheets
+      "'" + data.profile.whatsapp, // Prefix ' agar 0 di depan tidak terhapus
       data.preferences.propertyType || "Rumah Tinggal",
       data.preferences.targetCity || "Jabodetabek",
       data.preferences.targetArea || "-",
@@ -65,10 +81,10 @@ function doPost(e) {
       "NEW"
     ]);
 
-    // Kirim notifikasi email instan ke Gmail pemilik (0 Rupiah)
-    try {
-      var ownerEmail = Session.getEffectiveUser().getEmail();
-      if (ownerEmail) {
+    // Kirim notifikasi email instan ke Gmail pemilik
+    var targetEmail = getTargetEmail();
+    if (targetEmail) {
+      try {
         var subject = "🔥 [PropertySF Lead Baru] " + data.profile.name + " (" + (data.financial.budgetRange || "Budget Baru") + ")";
         var body = "Kriteria pembeli baru telah masuk ke PropertySF!\n\n" +
           "═══════════════════════════════════════\n" +
@@ -85,10 +101,10 @@ function doPost(e) {
           "Buka Admin Portal:\nhttps://property-sf-lac.vercel.app/admin.html\n\n" +
           "Buka Spreadsheet:\n" + SpreadsheetApp.getActiveSpreadsheet().getUrl();
 
-        MailApp.sendEmail(ownerEmail, subject, body);
+        MailApp.sendEmail(targetEmail, subject, body);
+      } catch (mailErr) {
+        Logger.log("Email notification error: " + mailErr.toString());
       }
-    } catch (mailErr) {
-      Logger.log("Email notification skipped: " + mailErr.toString());
     }
 
     return ContentService.createTextOutput(JSON.stringify({
@@ -146,28 +162,47 @@ function doGet(e) {
   }
 }
 
-// 3. ONE-CLICK INITIALIZATION: Jalankan fungsi ini sekali untuk setup header otomatis
+// 3. TES KIRIM EMAIL & AKTIVASI IZIN OTORISASI GOOGLE
+// >> JALANKAN FUNGSI INI SEKALI DARI EDITOR APPS SCRIPT <<
+function testSendEmail() {
+  var email = getTargetEmail();
+  if (!email) {
+    throw new Error("Silakan isi variabel NOTIFICATION_EMAIL di baris 15 dengan alamat Gmail Anda.");
+  }
+
+  MailApp.sendEmail(
+    email,
+    "🧪 [PropertySF Test] Notifikasi Email Berhasil Diaktifkan!",
+    "Halo!\n\nIzin pengiriman notifikasi email PropertySF telah aktif.\n" +
+    "Setiap kali ada lead pembeli baru yang masuk via form intake, Anda akan langsung menerima email notifikasi di alamat ini (" + email + ").\n\n" +
+    "Salam sukses,\nPropertySF Automation Engine"
+  );
+
+  Logger.log("Email berhasil dikirim ke: " + email);
+  SpreadsheetApp.getActiveSpreadsheet().toast("Email tes berhasil dikirim ke: " + email, "Sukses!");
+}
+
+// 4. ONE-CLICK INITIALIZATION: Jalankan fungsi ini untuk setup header kolom
 function setupSheetHeaders() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var headers = [
     "Timestamp",
     "ID Lead",
-    "Nama",
-    "WhatsApp",
-    "Tipe",
-    "Kota",
-    "Area",
-    "Budget",
+    "Nama Lengkap",
+    "No Whatsapp",
+    "Tipe Properti",
+    "Kota Target",
+    "Area / Patokan",
+    "Budget Maksimal",
     "Metode Bayar",
-    "Timeline",
-    "Kamar",
+    "Timeline Beli",
+    "Min Kamar",
     "Akses Mobil",
     "Sertifikat",
-    "Catatan",
+    "Catatan Tambahan",
     "Status"
   ];
 
-  // Set header di baris pertama
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
   sheet.setFrozenRows(1);
